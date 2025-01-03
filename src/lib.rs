@@ -50,6 +50,7 @@ impl Context for ABTestingHeaderRoot {}
 impl RootContext for ABTestingHeaderRoot {
     fn on_configure(&mut self, _: usize) -> bool {
         if let Some(config_bytes) = self.get_plugin_configuration() {
+            info!("config_bytes: {:?}", &config_bytes);
             self.config = serde_json::from_slice(&config_bytes).unwrap();
             info!("Config {}", self.config);
         }
