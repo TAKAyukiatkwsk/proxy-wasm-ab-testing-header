@@ -20,6 +20,24 @@ static_resources:
                     routes:
                       - match:
                           prefix: "/"
+                          headers:
+                            - name: X-Example-AB-Test
+                              exact_match: aaaa
+                        direct_response:
+                          status: 200
+                          body:
+                            inline_string: "OK (control)\n"
+                      - match:
+                          prefix: "/"
+                          headers:
+                            - name: X-Example-AB-Test
+                              exact_match: bbbb
+                        direct_response:
+                          status: 200
+                          body:
+                            inline_string: "OK (variation)\n"
+                      - match:
+                          prefix: "/"
                         direct_response:
                           status: 200
                           body:

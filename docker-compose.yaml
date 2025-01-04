@@ -4,6 +4,8 @@ services:
     hostname: envoy
     ports:
       - "10000:10000"
+    # environment:
+    #   - loglevel=debug
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
       - ./target/wasm32-wasip1/release:/etc/envoy/proxy-wasm-plugins
