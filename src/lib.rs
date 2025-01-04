@@ -1,6 +1,6 @@
 use core::fmt;
 
-use log::info;
+use log::{debug, info};
 use proxy_wasm::traits::*;
 use proxy_wasm::types::*;
 use serde::Deserialize;
@@ -24,7 +24,7 @@ struct Config {
     header_name: String,
     header_value_control: String,
     header_value_variation: String,
-    variation_weight: i8,
+    variation_weight: u8,
 }
 
 impl fmt::Display for Config {
@@ -40,9 +40,29 @@ struct ABTestingHeader {
 impl Context for ABTestingHeader {}
 
 impl HttpContext for ABTestingHeader {
-    // TODO: variation
     fn on_http_request_headers(&mut self, _num_headers: usize, _end_of_stream: bool) -> Action {
-        self.add_http_request_header(self.config.header_name.as_str(), "aaaa");
+        let mut buf = [0u8; 1];
+        getrandom::getrandom(&mut buf).unwrap();
+        debug!("getrandom {:?}", buf[0]);
+
+        let is_using_variation = if buf[0] >= 100 {
+            let rand = buf[0] % 100;
+            rand < self.config.variation_weight
+        } else {
+            buf[0] < self.config.variation_weight
+        };
+
+        let header_value = if is_using_variation {
+            self.config.header_value_variation.as_str()
+        } else {
+            self.config.header_value_control.as_str()
+        };
+
+        debug!(
+            "add http request header {}:{}",
+            self.config.header_name, header_value
+        );
+        self.add_http_request_header(self.config.header_name.as_str(), header_value);
         Action::Continue
     }
 }
