@@ -39,7 +39,13 @@ struct ABTestingHeader {
 
 impl Context for ABTestingHeader {}
 
-impl HttpContext for ABTestingHeader {}
+impl HttpContext for ABTestingHeader {
+    // TODO: variation
+    fn on_http_request_headers(&mut self, _num_headers: usize, _end_of_stream: bool) -> Action {
+        self.add_http_request_header(self.config.header_name.as_str(), "aaaa");
+        Action::Continue
+    }
+}
 
 struct ABTestingHeaderRoot {
     config: Box<Config>,
